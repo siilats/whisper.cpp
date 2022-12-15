@@ -243,6 +243,21 @@ struct whisper_segment {
 // }
 //
 // default hparams (Whisper tiny)
+
+//struct whisper_hparams {
+//    int32_t n_vocab       = 51864;
+//    int32_t n_audio_ctx   = 1500;
+//    int32_t n_audio_state = 1280;
+//    int32_t n_audio_head  = 20;
+//    int32_t n_audio_layer = 32;
+//    int32_t n_text_ctx    = 448;
+//    int32_t n_text_state  = 1280;
+//    int32_t n_text_head   = 20;
+//    int32_t n_text_layer  = 32;
+//    int32_t n_mels        = 80;
+//    int32_t f16           = 1;
+//};
+
 struct whisper_hparams {
     int32_t n_vocab       = 51864;
     int32_t n_audio_ctx   = 1500;

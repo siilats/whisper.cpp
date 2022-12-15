@@ -17,6 +17,8 @@
 		18627C9429052C4900BD2A04 /* whisper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 18627C9329052C4900BD2A04 /* whisper.cpp */; };
 		18627C9629052C5800BD2A04 /* ggml.c in Sources */ = {isa = PBXBuildFile; fileRef = 18627C9529052C5800BD2A04 /* ggml.c */; settings = {COMPILER_FLAGS = "-DGGML_USE_ACCELERATE"; }; };
 		18627C9B29052CFF00BD2A04 /* ggml-base.en.bin in Resources */ = {isa = PBXBuildFile; fileRef = 18627C9A29052CFF00BD2A04 /* ggml-base.en.bin */; };
+		7BC37B242941841D00C56E98 /* ggml-large.bin in Resources */ = {isa = PBXBuildFile; fileRef = 7BC37B232941841D00C56E98 /* ggml-large.bin */; };
+		7BC37B262941950C00C56E98 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7BC37B252941950C00C56E98 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -37,6 +39,9 @@
 		18627C9529052C5800BD2A04 /* ggml.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ggml.c; path = ../../../ggml.c; sourceTree = "<group>"; };
 		18627C9729052C6600BD2A04 /* ggml.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ggml.h; path = ../../../ggml.h; sourceTree = "<group>"; };
 		18627C9A29052CFF00BD2A04 /* ggml-base.en.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = "ggml-base.en.bin"; path = "../../../models/ggml-base.en.bin"; sourceTree = "<group>"; };
+		7BC37B232941841D00C56E98 /* ggml-large.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = "ggml-large.bin"; path = "../../../models/ggml-large.bin"; sourceTree = "<group>"; };
+		7BC37B252941950C00C56E98 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = "../../../../../../Downloads/AppIcons (5)/Assets.xcassets"; sourceTree = "<group>"; };
+		7BC37B2729428F7400C56E98 /* whisper.objc.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = whisper.objc.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -69,6 +74,8 @@
 		18627C7829052BDF00BD2A04 /* whisper.objc */ = {
 			isa = PBXGroup;
 			children = (
+				7BC37B2729428F7400C56E98 /* whisper.objc.entitlements */,
+				7BC37B232941841D00C56E98 /* ggml-large.bin */,
 				18627C9A29052CFF00BD2A04 /* ggml-base.en.bin */,
 				18627C9729052C6600BD2A04 /* ggml.h */,
 				18627C9529052C5800BD2A04 /* ggml.c */,
@@ -85,6 +92,7 @@
 				18627C8729052BE000BD2A04 /* LaunchScreen.storyboard */,
 				18627C8A29052BE000BD2A04 /* Info.plist */,
 				18627C8B29052BE000BD2A04 /* main.m */,
+				7BC37B252941950C00C56E98 /* Assets.xcassets */,
 			);
 			path = whisper.objc;
 			sourceTree = "<group>";
@@ -150,6 +158,8 @@
 				18627C8629052BE000BD2A04 /* Assets.xcassets in Resources */,
 				18627C8429052BDF00BD2A04 /* Main.storyboard in Resources */,
 				18627C9B29052CFF00BD2A04 /* ggml-base.en.bin in Resources */,
+				7BC37B262941950C00C56E98 /* Assets.xcassets in Resources */,
+				7BC37B242941841D00C56E98 /* ggml-large.bin in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -306,12 +316,16 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = whisper.objc/whisper.objc.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = P8JZH34X63;
+				CURRENT_PROJECT_VERSION = 2;
+				DEVELOPMENT_TEAM = D52J62XJX3;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = whisper.objc/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Hear.com Whisper";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "This app requires microphone access in order to transcribe speech";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -322,7 +336,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.ggerganov.whisper-objc";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.bytelogics.whisper-objc";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -334,12 +348,16 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = whisper.objc/whisper.objc.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = P8JZH34X63;
+				CURRENT_PROJECT_VERSION = 2;
+				DEVELOPMENT_TEAM = D52J62XJX3;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = whisper.objc/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Hear.com Whisper";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "This app requires microphone access in order to transcribe speech";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -350,7 +368,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.ggerganov.whisper-objc";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.bytelogics.whisper-objc";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";

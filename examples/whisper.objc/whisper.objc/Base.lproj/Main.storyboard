@@ -68,6 +68,10 @@
                                     <action selector="onRealtime:" destination="BYZ-38-t0r" eventType="touchUpInside" id="nhn-jT-aQJ"/>
                                 </connections>
                             </button>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" fixedFrame="YES" image="Image" translatesAutoresizingMaskIntoConstraints="NO" id="RoZ-fR-wO8">
+                                <rect key="frame" x="-27" y="607" width="464" height="184"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            </imageView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -89,6 +93,7 @@
         </scene>
     </scenes>
     <resources>
+        <image name="Image" width="464" height="184"/>
         <systemColor name="labelColor">
             <color red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
