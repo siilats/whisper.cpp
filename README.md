@@ -2,6 +2,7 @@
 
 [![Actions Status](https://github.com/ggerganov/whisper.cpp/workflows/CI/badge.svg)](https://github.com/ggerganov/whisper.cpp/actions)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![npm](https://img.shields.io/npm/v/whisper.cpp.svg)](https://www.npmjs.com/package/whisper.cpp/)
 
 High-performance inference of [OpenAI's Whisper](https://github.com/openai/whisper) automatic speech recognition (ASR) model:
 
@@ -448,8 +449,8 @@ in [models](models).
 
 - [X] Rust: [tazz4843/whisper-rs](https://github.com/tazz4843/whisper-rs)
 - [X] Objective-C / Swift: [ggerganov/whisper.spm](https://github.com/ggerganov/whisper.spm)
-- [ ] Python:
-- [ ] Java:
+- [X] Javascript: [bindings/javascript](bindings/javascript)
+- [ ] Python: soon
 
 ## Examples
 
@@ -459,10 +460,10 @@ Some of the examples are even ported to run in the browser using WebAssembly. Ch
 | Example | Web | Description |
 | ---     | --- | ---         |
 | [main](examples/main) | [whisper.wasm](examples/whisper.wasm) | Tool for translating and transcribing audio using Whisper |
-| [bench](examples/bench) | | Benchmark the performance of Whisper on your machine |
+| [bench](examples/bench) | [bench.wasm](examples/bench.wasm) | Benchmark the performance of Whisper on your machine |
 | [stream](examples/stream) | [stream.wasm](examples/stream.wasm) | Real-time transcription of raw microphone capture |
 | [command](examples/command) | [command.wasm](examples/command.wasm) | Basic voice assistant example for receiving voice commands from the mic |
-| | [talk.wasm](examples/talk.wasm) | Talk with a GPT-2 bot in your browser |
+| [talk](examples/talk) | [talk.wasm](examples/talk.wasm) | Talk with a GPT-2 bot |
 | [whisper.objc](examples/whisper.objc) | | iOS mobile application using whisper.cpp |
 | [whisper.nvim](examples/whisper.nvim) | | Speech-to-text plugin for Neovim |
 | [generate-karaoke.sh](examples/generate-karaoke.sh) | | Helper script to easily [generate a karaoke video](https://youtu.be/uj7hVta4blM) of raw audio capture |

@@ -14,6 +14,11 @@
 #include <stdint.h>
 #include <stdio.h>
 
+// if C99 - static_assert is nop
+#ifndef static_assert
+#define static_assert(cond, msg)
+#endif
+
 #if defined _MSC_VER || defined(__MINGW32__)
 
 #if !defined(__MINGW32__)
@@ -67,6 +72,10 @@ static int sched_yield (void) {
 #include <stdatomic.h>
 
 typedef void* thread_ret_t;
+#endif
+
+#ifdef __HAIKU__
+#define static_assert(cond, msg) _Static_assert(cond, msg)
 #endif
 
 #define GGML_DEBUG 0
@@ -131,9 +140,6 @@ ggml_fp16_t ggml_fp32_to_fp16(float x) {
 #include <immintrin.h>
 #endif
 
-// FP16 <-> FP32
-// ref: https://github.com/Maratyszcza/FP16
-
 #ifdef __F16C__
 float ggml_fp16_to_fp32(ggml_fp16_t h) {
     return _cvtsh_ss(h);
@@ -147,11 +153,15 @@ ggml_fp16_t ggml_fp32_to_fp16(float f) {
 
 #else
 
+// FP16 <-> FP32
+// ref: https://github.com/Maratyszcza/FP16
+
 static inline float fp32_from_bits(uint32_t w) {
     union {
         uint32_t as_bits;
         float as_value;
-    } fp32 = { w };
+    } fp32;
+    fp32.as_bits = w;
     return fp32.as_value;
 }
 
@@ -159,7 +169,8 @@ static inline uint32_t fp32_to_bits(float f) {
 	union {
 		float as_value;
 		uint32_t as_bits;
-	} fp32 = { f };
+	} fp32;
+	fp32.as_value = f;
 	return fp32.as_bits;
 }
 
@@ -428,10 +439,10 @@ inline static void ggml_vec_dot_f32(const int n, float * restrict s, const float
         y2 = _mm256_loadu_ps(y + i + 16);
         y3 = _mm256_loadu_ps(y + i + 24);
 
-	sum0 = _mm256_add_ps(_mm256_mul_ps(x0, y0), sum0);
-	sum1 = _mm256_add_ps(_mm256_mul_ps(x1, y1), sum1);
-	sum2 = _mm256_add_ps(_mm256_mul_ps(x2, y2), sum2);
-	sum3 = _mm256_add_ps(_mm256_mul_ps(x3, y3), sum3);
+        sum0 = _mm256_add_ps(_mm256_mul_ps(x0, y0), sum0);
+        sum1 = _mm256_add_ps(_mm256_mul_ps(x1, y1), sum1);
+        sum2 = _mm256_add_ps(_mm256_mul_ps(x2, y2), sum2);
+        sum3 = _mm256_add_ps(_mm256_mul_ps(x3, y3), sum3);
     }
 
     sum0 = _mm256_add_ps(sum0, sum1);
@@ -669,10 +680,10 @@ inline static void ggml_vec_dot_f16(const int n, float * restrict s, ggml_fp16_t
         y2 = _mm256_cvtph_ps(_mm_loadu_si128((__m128i*)(y + i + 16)));
         y3 = _mm256_cvtph_ps(_mm_loadu_si128((__m128i*)(y + i + 24)));
 
-	sum0 = _mm256_add_ps(_mm256_mul_ps(x0, y0), sum0);
-	sum1 = _mm256_add_ps(_mm256_mul_ps(x1, y1), sum1);
-	sum2 = _mm256_add_ps(_mm256_mul_ps(x2, y2), sum2);
-	sum3 = _mm256_add_ps(_mm256_mul_ps(x3, y3), sum3);
+        sum0 = _mm256_add_ps(_mm256_mul_ps(x0, y0), sum0);
+        sum1 = _mm256_add_ps(_mm256_mul_ps(x1, y1), sum1);
+        sum2 = _mm256_add_ps(_mm256_mul_ps(x2, y2), sum2);
+        sum3 = _mm256_add_ps(_mm256_mul_ps(x3, y3), sum3);
     }
 
     const __m256 sum01 = _mm256_add_ps(sum0, sum1);
@@ -838,10 +849,10 @@ inline static void ggml_vec_mad_f32(const int n, float * restrict y, const float
         y2 = _mm256_loadu_ps(y + i + 16);
         y3 = _mm256_loadu_ps(y + i + 24);
 
-	y0 = _mm256_add_ps(_mm256_mul_ps(x0, v4), y0);
-	y1 = _mm256_add_ps(_mm256_mul_ps(x1, v4), y1);
-	y2 = _mm256_add_ps(_mm256_mul_ps(x2, v4), y2);
-	y3 = _mm256_add_ps(_mm256_mul_ps(x3, v4), y3);
+        y0 = _mm256_add_ps(_mm256_mul_ps(x0, v4), y0);
+        y1 = _mm256_add_ps(_mm256_mul_ps(x1, v4), y1);
+        y2 = _mm256_add_ps(_mm256_mul_ps(x2, v4), y2);
+        y3 = _mm256_add_ps(_mm256_mul_ps(x3, v4), y3);
 
         _mm256_storeu_ps(y + i + 0, y0);
         _mm256_storeu_ps(y + i + 8, y1);
@@ -1035,10 +1046,10 @@ inline static void ggml_vec_mad_f16(const int n, ggml_fp16_t * restrict y, ggml_
         x2 = _mm256_cvtph_ps(_mm_loadu_si128((__m128i*)(x + i + 16)));
         x3 = _mm256_cvtph_ps(_mm_loadu_si128((__m128i*)(x + i + 24)));
 
-	y0 = _mm256_add_ps(_mm256_mul_ps(x0, v8), y0);
-	y1 = _mm256_add_ps(_mm256_mul_ps(x1, v8), y1);
-	y2 = _mm256_add_ps(_mm256_mul_ps(x2, v8), y2);
-	y3 = _mm256_add_ps(_mm256_mul_ps(x3, v8), y3);
+        y0 = _mm256_add_ps(_mm256_mul_ps(x0, v8), y0);
+        y1 = _mm256_add_ps(_mm256_mul_ps(x1, v8), y1);
+        y2 = _mm256_add_ps(_mm256_mul_ps(x2, v8), y2);
+        y3 = _mm256_add_ps(_mm256_mul_ps(x3, v8), y3);
 
         _mm_storeu_si128((__m128i*)(y + i + 0 ), _mm256_cvtps_ph(y0, 0));
         _mm_storeu_si128((__m128i*)(y + i + 8 ), _mm256_cvtps_ph(y1, 0));
@@ -4217,7 +4228,7 @@ bool ggml_compute_forward_mul_mat_use_blas(
     const int ne1 = dst->ne[1];
 
     // TODO: find the optimal values for these
-    if (ggml_is_contiguous(src1) && ne0 >= 32 && ne1 >= 32 && ne10 >= 32) {
+    if (ggml_is_contiguous(src0) && ggml_is_contiguous(src1) && ne0 >= 32 && ne1 >= 32 && ne10 >= 32) {
         //printf("BLAS: %d %d %d\n", ne0, ne1, ne10);
         return true;
     }
@@ -4294,7 +4305,6 @@ void ggml_compute_forward_mul_mat_f32(
 
 #if defined(GGML_USE_ACCELERATE) || defined(GGML_USE_OPENBLAS)
     if (ggml_compute_forward_mul_mat_use_blas(src0, src1, dst)) {
-        GGML_ASSERT(ggml_is_contiguous(src0));
         GGML_ASSERT(nb10 == sizeof(float));
 
         if (params->ith != 0) return;
@@ -4586,13 +4596,22 @@ void ggml_compute_forward_mul_mat_f16_f32(
                 //    }
                 //}
 
-                // zT = y * xT
                 {
+#if 1
+                    // zT = y * xT
                     cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasTrans,
                             ne11, ne01, ne10,
-                            1.0f,    y, ne10,
-                                     x, ne10,
+                            1.0f,    y, ne00,
+                                     x, ne00,
                             0.0f,    d, ne01);
+#else
+                    // zT = (xT * y)T
+                    cblas_sgemm(CblasColMajor, CblasTrans, CblasNoTrans,
+                            ne01, ne11, ne10,
+                            1.0f,    x, ne00,
+                                     y, ne00,
+                            0.0f,    d, ne01);
+#endif
                 }
             }
         }

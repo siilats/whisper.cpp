@@ -1,8 +1,8 @@
 #
-# libmain
+# libbench
 #
 
-set(TARGET libmain)
+set(TARGET libbench)
 
 add_executable(${TARGET}
     emscripten.cpp
@@ -16,13 +16,13 @@ unset(EXTRA_FLAGS)
 
 if (WHISPER_WASM_SINGLE_FILE)
     set(EXTRA_FLAGS "-s SINGLE_FILE=1")
-    message(STATUS "Embedding WASM inside main.js")
+    message(STATUS "Embedding WASM inside bench.js")
 
     add_custom_command(
         TARGET ${TARGET} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy
-        ${CMAKE_BINARY_DIR}/bin/libmain.js
-        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/whisper.wasm/main.js
+        ${CMAKE_BINARY_DIR}/bin/libbench.js
+        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/bench.wasm/bench.js
         )
 endif()
 
@@ -38,10 +38,10 @@ set_target_properties(${TARGET} PROPERTIES LINK_FLAGS " \
     ")
 
 #
-# whisper.wasm
+# bench.wasm
 #
 
-set(TARGET whisper.wasm)
+set(TARGET bench.wasm)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/index-tmpl.html  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TARGET}/index.html @ONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/../helpers.js    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TARGET}/helpers.js @ONLY)
