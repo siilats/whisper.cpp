@@ -33,7 +33,7 @@ bool whisper_params_parse(int argc, char ** argv, whisper_params & params) {
     return true;
 }
 
-void whisper_print_usage(int argc, char ** argv, const whisper_params & params) {
+void whisper_print_usage(int /*argc*/, char ** argv, const whisper_params & params) {
     fprintf(stderr, "\n");
     fprintf(stderr, "usage: %s [options]\n", argv[0]);
     fprintf(stderr, "\n");
@@ -53,7 +53,7 @@ int main(int argc, char ** argv) {
 
     // whisper init
 
-    struct whisper_context * ctx = whisper_init(params.model.c_str());
+    struct whisper_context * ctx = whisper_init_from_file(params.model.c_str());
 
     {
         fprintf(stderr, "\n");

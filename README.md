@@ -4,11 +4,14 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![npm](https://img.shields.io/npm/v/whisper.cpp.svg)](https://www.npmjs.com/package/whisper.cpp/)
 
+Stable: [v1.0.4](https://github.com/ggerganov/whisper.cpp/releases/tag/v1.0.4) / Beta: [v1.1.0](https://github.com/ggerganov/whisper.cpp/releases/tag/v1.1.0) / [Roadmap | F.A.Q.](https://github.com/ggerganov/whisper.cpp/discussions/126)
+
 High-performance inference of [OpenAI's Whisper](https://github.com/openai/whisper) automatic speech recognition (ASR) model:
 
 - Plain C/C++ implementation without dependencies
 - Apple silicon first-class citizen - optimized via Arm Neon and Accelerate framework
 - AVX intrinsics support for x86 architectures
+- VSX intrinsics support for POWER architectures
 - Mixed F16 / F32 precision
 - Low memory usage (Flash Attention + Flash Forward)
 - Zero memory allocations at runtime
@@ -19,11 +22,11 @@ Supported platforms:
 
 - [x] Mac OS (Intel and Arm)
 - [x] [iOS](examples/whisper.objc)
-- [x] Linux
+- [x] [Android](examples/whisper.android)
+- [x] Linux / [FreeBSD](https://github.com/ggerganov/whisper.cpp/issues/56#issuecomment-1350920264)
 - [x] [WebAssembly](examples/whisper.wasm)
 - [x] Windows ([MSVC](https://github.com/ggerganov/whisper.cpp/blob/master/.github/workflows/build.yml#L117-L144) and [MinGW](https://github.com/ggerganov/whisper.cpp/issues/168)]
 - [x] [Raspberry Pi](https://github.com/ggerganov/whisper.cpp/discussions/166)
-- [x] [Android](https://github.com/ggerganov/whisper.cpp/issues/30)
 
 The entire implementation of the model is contained in 2 source files:
 
@@ -68,7 +71,7 @@ Now build the [main](examples/main) example and transcribe an audio file like th
 make
 
 # transcribe an audio file
-./main -f input.wav
+./main -f samples/jfk.wav
 ```
 
 ---
@@ -86,27 +89,36 @@ c++ -I. -I./examples -O3 -std=c++11 -pthread examples/main/main.cpp whisper.o gg
 usage: ./main [options] file0.wav file1.wav ...
 
 options:
-  -h,       --help          [default] show this help message and exit
-  -t N,     --threads N     [4      ] number of threads to use during computation
-  -p N,     --processors N  [1      ] number of processors to use during computation
-  -ot N,    --offset-t N    [0      ] time offset in milliseconds
-  -on N,    --offset-n N    [0      ] segment index offset
-  -d  N,    --duration N    [0      ] duration of audio to process in milliseconds
-  -mc N,    --max-context N [-1     ] maximum number of text context tokens to store
-  -ml N,    --max-len N     [0      ] maximum segment length in characters
-  -wt N,    --word-thold N  [0.01   ] word timestamp probability threshold
-  -su,      --speed-up      [false  ] speed up audio by x2 (reduced accuracy)
-  -tr,      --translate     [false  ] translate from source language to english
-  -otxt,    --output-txt    [false  ] output result in a text file
-  -ovtt,    --output-vtt    [false  ] output result in a vtt file
-  -osrt,    --output-srt    [false  ] output result in a srt file
-  -owts,    --output-words  [false  ] output script for generating karaoke video
-  -ps,      --print-special [false  ] print special tokens
-  -pc,      --print-colors  [false  ] print colors
-  -nt,      --no-timestamps [true   ] do not print timestamps
-  -l LANG,  --language LANG [en     ] spoken language
-  -m FNAME, --model FNAME   [models/ggml-base.en.bin] model path
-  -f FNAME, --file FNAME    [       ] input WAV file path
+  -h,       --help            [default] show this help message and exit
+  -t N,     --threads N       [4      ] number of threads to use during computation
+  -p N,     --processors N    [1      ] number of processors to use during computation
+  -ot N,    --offset-t N      [0      ] time offset in milliseconds
+  -on N,    --offset-n N      [0      ] segment index offset
+  -d  N,    --duration N      [0      ] duration of audio to process in milliseconds
+  -mc N,    --max-context N   [-1     ] maximum number of text context tokens to store
+  -ml N,    --max-len N       [0      ] maximum segment length in characters
+  -bo N,    --best-of N       [5      ] number of best candidates to keep
+  -bs N,    --beam-size N     [-1     ] beam size for beam search
+  -wt N,    --word-thold N    [0.01   ] word timestamp probability threshold
+  -et N,    --entropy-thold N [2.40   ] entropy threshold for decoder fail
+  -lpt N,   --logprob-thold N [-1.00  ] log probability threshold for decoder fail
+  -su,      --speed-up        [false  ] speed up audio by x2 (reduced accuracy)
+  -tr,      --translate       [false  ] translate from source language to english
+  -di,      --diarize         [false  ] stereo audio diarization
+  -otxt,    --output-txt      [false  ] output result in a text file
+  -ovtt,    --output-vtt      [false  ] output result in a vtt file
+  -osrt,    --output-srt      [false  ] output result in a srt file
+  -owts,    --output-words    [false  ] output script for generating karaoke video
+  -ocsv,    --output-csv      [false  ] output result in a CSV file
+  -ps,      --print-special   [false  ] print special tokens
+  -pc,      --print-colors    [false  ] print colors
+  -pp,      --print-progress  [false  ] print progress
+  -nt,      --no-timestamps   [true   ] do not print timestamps
+  -l LANG,  --language LANG   [en     ] spoken language ('auto' for auto-detect)
+            --prompt PROMPT   [       ] initial prompt
+  -m FNAME, --model FNAME     [models/ggml-base.en.bin] model path
+  -f FNAME, --file FNAME      [       ] input WAV file path
+
 
 bash ./models/download-ggml-model.sh base.en
 Downloading ggml model base.en ...
@@ -209,17 +221,7 @@ make large
 ## Limitations
 
 - Inference only
-- No GPU support
-- Very basic greedy sampling scheme - always pick up the token with highest probability.
-  This should be similar to the [GreedyDecoder](https://github.com/openai/whisper/blob/main/whisper/decoding.py#L249-L274)
-  from the original python implementation, so in order to make a fair comparison between the 2 implementations, make sure
-  to run the python code with the following parameters:
-
-  ```
-  whisper --best_of None --beam_size None ...
-  ```
-
-  In the future, `whisper.cpp` will support more sampling strategies.
+- No GPU support (yet)
 
 ## Another example
 
@@ -304,6 +306,7 @@ The [stream](examples/stream) tool samples the audio every half a second and run
 More info is available in [issue #10](https://github.com/ggerganov/whisper.cpp/issues/10).
 
 ```java
+make stream
 ./stream -m ./models/ggml-base.en.bin -t 8 --step 500 --length 5000
 ```
 
@@ -445,12 +448,13 @@ or manually from here:
 For more details, see the conversion script [models/convert-pt-to-ggml.py](models/convert-pt-to-ggml.py) or the README
 in [models](models).
 
-## Bindings
+## [Bindings](https://github.com/ggerganov/whisper.cpp/discussions/categories/bindings)
 
-- [X] Rust: [tazz4843/whisper-rs](https://github.com/tazz4843/whisper-rs)
-- [X] Objective-C / Swift: [ggerganov/whisper.spm](https://github.com/ggerganov/whisper.spm)
-- [X] Javascript: [bindings/javascript](bindings/javascript)
-- [ ] Python: soon
+- [X] Rust: [tazz4843/whisper-rs](https://github.com/tazz4843/whisper-rs) | [#310](https://github.com/ggerganov/whisper.cpp/discussions/310)
+- [X] Javascript: [bindings/javascript](bindings/javascript) | [#309](https://github.com/ggerganov/whisper.cpp/discussions/309)
+- [X] Go: [bindings/go](bindings/go) | [#312](https://github.com/ggerganov/whisper.cpp/discussions/312)
+- [X] Objective-C / Swift: [ggerganov/whisper.spm](https://github.com/ggerganov/whisper.spm) | [#313](https://github.com/ggerganov/whisper.cpp/discussions/313)
+- [ ] Python: soon | [WIP](https://github.com/ggerganov/whisper.cpp/issues/9)
 
 ## Examples
 
@@ -465,6 +469,8 @@ Some of the examples are even ported to run in the browser using WebAssembly. Ch
 | [command](examples/command) | [command.wasm](examples/command.wasm) | Basic voice assistant example for receiving voice commands from the mic |
 | [talk](examples/talk) | [talk.wasm](examples/talk.wasm) | Talk with a GPT-2 bot |
 | [whisper.objc](examples/whisper.objc) | | iOS mobile application using whisper.cpp |
+| [whisper.swiftui](examples/whisper.swiftui) | | SwiftUI iOS / macOS application using whisper.cpp |
+| [whisper.android](examples/whisper.android) | | Android mobile application using whisper.cpp |
 | [whisper.nvim](examples/whisper.nvim) | | Speech-to-text plugin for Neovim |
 | [generate-karaoke.sh](examples/generate-karaoke.sh) | | Helper script to easily [generate a karaoke video](https://youtu.be/uj7hVta4blM) of raw audio capture |
 | [livestream.sh](examples/livestream.sh) | | [Livestream audio transcription](https://github.com/ggerganov/whisper.cpp/issues/185) |

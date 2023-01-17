@@ -28,6 +28,11 @@ void bench_main(size_t index) {
         return;
     }
 
+    {
+        fprintf(stderr, "\n");
+        fprintf(stderr, "system_info: n_threads = %d / %d | %s\n", n_threads, std::thread::hardware_concurrency(), whisper_print_system_info());
+    }
+
     if (int ret = whisper_encode(ctx, 0, n_threads) != 0) {
         fprintf(stderr, "error: failed to encode model: %d\n", ret);
         return;
@@ -52,7 +57,7 @@ EMSCRIPTEN_BINDINGS(bench) {
     emscripten::function("init", emscripten::optional_override([](const std::string & path_model) {
         for (size_t i = 0; i < g_contexts.size(); ++i) {
             if (g_contexts[i] == nullptr) {
-                g_contexts[i] = whisper_init(path_model.c_str());
+                g_contexts[i] = whisper_init_from_file(path_model.c_str());
                 if (g_contexts[i] != nullptr) {
                     if (g_worker.joinable()) {
                         g_worker.join();
