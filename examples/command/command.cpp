@@ -42,10 +42,10 @@ struct whisper_params {
 
     std::string language  = "en";
     std::string model     = "models/ggml-base.en.bin";
-    std::string fname_out   = "out.txt";
+    std::string fname_out;
     std::string commands;
     std::string prompt;
-    std::string speak     = "say";
+    std::string speak     = "./examples/talk/speak.sh";
 };
 
 void whisper_print_usage(int argc, char ** argv, const whisper_params & params);
