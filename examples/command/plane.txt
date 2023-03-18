@@ -1,0 +1,8 @@
+enable
+disable
+gear
+down
+flaps
+approach
+landing
+emergency

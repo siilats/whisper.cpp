@@ -1,7 +1,7 @@
 if (WHISPER_SUPPORT_SDL2)
     # command
     set(TARGET command)
-    add_executable(${TARGET} command.cpp)
+    add_executable(${TARGET} command.cpp command.cpp)
 
     include(DefaultTargetOptions)
 

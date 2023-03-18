@@ -660,6 +660,36 @@ struct whisper_context {
     whisper_model model;
     whisper_vocab vocab;
     whisper_state * state = nullptr;
+    std::string path_model; // populated by whisper_init_from_file()
+#ifdef WHISPER_USE_COREML
+    whisper_coreml_context * ctx_coreml;
+#endif
+    std::vector<uint8_t> buf_scratch[WHISPER_MAX_SCRATCH_BUFFERS];
+
+    int    buf_last = 0;
+    size_t buf_max_size[WHISPER_MAX_SCRATCH_BUFFERS] = { 0 };
+    
+    void use_buf(struct ggml_context * ctx, int i) {
+#if defined(WHISPER_USE_SCRATCH)
+        size_t last_size = 0;
+
+        if (i == -1) {
+            last_size = ggml_set_scratch(ctx, { 0, 0, nullptr, });
+        } else {
+            auto & buf = buf_scratch[i];
+            last_size = ggml_set_scratch(ctx, { 0, buf.size(), buf.data(), });
+        }
+
+        if (buf_last >= 0) {
+            buf_max_size[buf_last] = std::max(buf_max_size[buf_last], last_size);
+        }
+
+        buf_last = i;
+#else
+        (void) i;
+        (void) ctx;
+#endif
+    }
 };
 
 template<typename T>

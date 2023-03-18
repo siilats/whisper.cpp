@@ -1,5 +1,5 @@
 set(TARGET main)
-add_executable(${TARGET} main.cpp)
+add_executable(${TARGET} main.cpp ../command/command.cpp)
 
 include(DefaultTargetOptions)
 

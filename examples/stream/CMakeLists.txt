@@ -1,7 +1,7 @@
 if (WHISPER_SUPPORT_SDL2)
     # stream
     set(TARGET stream)
-    add_executable(${TARGET} stream.cpp)
+    add_executable(${TARGET} stream.cpp ../command/command.cpp)
 
     include(DefaultTargetOptions)
 
